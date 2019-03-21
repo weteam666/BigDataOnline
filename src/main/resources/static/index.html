@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>实时成交额</title>
+    <script src="./js/angular.min.js"></script>
+</head>
+
+<script>
+    var app = angular.module('myApp', []);
+    /**
+     * angularjs controller层
+     */
+    app.controller('dataController', function ($interval,$scope, dataService) {
+        // $scope.showData = function () {
+        //     var currentTime = new Date().getTime();
+        //     dataService.showData(currentTime).success(
+        //         function (response) {
+        //             // console.log(response);
+        //             if (response.success) {
+        //                 $scope.currentTime = response.obj.payTime;
+        //                 $scope.data = (response.obj.totalFee / 100).toFixed(2);
+        //                 console.log(response.obj.totalFee);
+        //             }
+        //         }
+        //     )
+        // }
+
+        var timeout_upd = $interval($scope.showData = function () {
+            var currentTime = new Date().getTime();
+            dataService.showData(currentTime).success(
+                function (response) {
+                    // console.log(response);
+                    if (response.success) {
+                        $scope.currentTime = response.obj.payTime;
+                        $scope.data = (response.obj.totalFee / 100).toFixed(2);
+                        console.log(response.obj.totalFee);
+                    }
+                }
+            )
+        },1000);
+
+
+    });
+    /**
+     * angularjs service层
+     */
+    app.service('dataService', function ($http) {
+        this.showData = function (currentTime) {
+            return $http.get("/show/getData?currentTime=" + currentTime);
+        }
+    });
+</script>
+<body ng-app="myApp" ng-controller="dataController" > <!-- ng-init="showData()" -->
+
+<div ng-if="data">
+   当前时间:{{currentTime}} 实时成交额: {{data}} 元
+</div>
+
+</body>
+</html>
